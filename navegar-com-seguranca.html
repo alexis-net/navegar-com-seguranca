@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Navegar com Segurança - Aula de Cibersegurança</title>
+<style>
+  :root{ --azul:#1F497D; --azul2:#2E75B6; --claro:#EAF1F9; --ok:#2E7D32; --erro:#C62828; --amarelo:#F2A44A; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;background:#F5F7FA;font-size:17px}
+  header{background:var(--azul);color:#fff;padding:18px 24px}
+  header h1{margin:0;font-size:22px}
+  header p{margin:4px 0 0;font-size:14px;opacity:.85}
+  nav{display:flex;flex-wrap:wrap;gap:8px;background:#fff;padding:12px 24px;border-bottom:2px solid var(--claro)}
+  nav button{font-size:16px;padding:10px 16px;border:1px solid var(--azul2);background:#fff;color:var(--azul);border-radius:6px;cursor:pointer}
+  nav button.ativo{background:var(--azul2);color:#fff}
+  main{max-width:900px;margin:24px auto;padding:0 24px 40px}
+  .cartao{background:#fff;border:1px solid #D8E1EC;border-radius:8px;padding:20px;margin-bottom:18px}
+  .cartao h2{margin:0 0 10px;color:var(--azul);font-size:20px}
+  .cartao h3{margin:18px 0 6px;color:var(--azul);font-size:17px}
+  .grade{display:flex;flex-wrap:wrap;gap:14px}
+  .grade .modulo{flex:1 1 44%}
+  .modulo{background:var(--claro);border-left:5px solid var(--azul2);border-radius:6px;padding:14px;cursor:pointer}
+  .modulo b{display:block;color:var(--azul);margin-bottom:4px}
+  .modulo span{font-size:14px}
+  .email{border:1px solid #ccc;border-radius:6px;background:#fff;font-size:15px}
+  .email .cab{background:#F0F0F0;padding:10px 14px;border-bottom:1px solid #ddd}
+  .email .corpo{padding:14px}
+  .botoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button.acao{font-size:16px;padding:10px 18px;border:0;border-radius:6px;background:var(--azul2);color:#fff;cursor:pointer}
+  button.acao.secundario{background:#fff;color:var(--azul2);border:1px solid var(--azul2)}
+  .alt{display:block;width:100%;text-align:left;margin:6px 0;padding:12px;border:1px solid #cfd8e3;background:#fff;border-radius:6px;font-size:16px;cursor:pointer}
+  .alt.certo{border-color:var(--ok);background:#E8F5E9}
+  .alt.errado{border-color:var(--erro);background:#FFEBEE}
+  .aviso{padding:12px;border-radius:6px;margin-top:12px;font-size:15px}
+  .aviso.ok{background:#E8F5E9;border-left:5px solid var(--ok)}
+  .aviso.nok{background:#FFEBEE;border-left:5px solid var(--erro)}
+  .dica{border-left:5px solid var(--amarelo);background:#FDF3E7;padding:12px;border-radius:6px;margin-bottom:10px;font-size:15px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th,td{border:1px solid #cfd8e3;padding:8px;text-align:left}
+  th{background:var(--claro);color:var(--azul)}
+  .rodape{font-size:13px;color:#666;text-align:center;padding:10px}
+  .oculto{display:none}
+  .barra{height:10px;background:#E3E9F0;border-radius:6px;overflow:hidden}
+  .barra i{display:block;height:100%;background:var(--azul2)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Navegar com Segurança</h1>
+  <p>Aula de cibersegurança para escolas — Atividade Extensionista IV — conteúdo versão <span id="versao"></span></p>
+</header>
+
+<nav id="menu"></nav>
+
+<main>
+  <!-- INÍCIO -->
+  <section id="tela-inicio" class="tela">
+    <div class="cartao">
+      <h2>Módulos educacionais</h2>
+      <p>Escolha um módulo para começar. Ao final de cada módulo há um quiz e uma simulação prática.</p>
+      <div class="grade" id="lista-modulos"></div>
+    </div>
+    <div class="cartao">
+      <h2>Seu progresso</h2>
+      <div class="barra"><i id="barra-progresso" style="width:0%"></i></div>
+      <p id="txt-progresso">Nenhum módulo concluído ainda.</p>
+    </div>
+  </section>
+
+  <!-- MÓDULO -->
+  <section id="tela-modulo" class="tela oculto">
+    <div class="cartao" id="conteudo-modulo"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="tela-quiz" class="tela oculto">
+    <div class="cartao">
+      <h2>Quiz de conhecimentos</h2>
+      <p id="quiz-posicao"></p>
+      <p id="quiz-pergunta" style="font-weight:bold"></p>
+      <div id="quiz-alternativas"></div>
+      <div id="quiz-retorno"></div>
+      <div class="botoes"><button class="acao" id="quiz-proxima">Próxima pergunta</button></div>
+    </div>
+  </section>
+
+  <!-- SIMULAÇÃO -->
+  <section id="tela-simulacao" class="tela oculto">
+    <div class="cartao">
+      <h2>Simulação: esta mensagem é golpe?</h2>
+      <p>Analise a mensagem abaixo e decida se ela é confiável ou se é uma tentativa de golpe.</p>
+      <div class="email">
+        <div class="cab">
+          <div><b>De:</b> <span id="sim-de"></span></div>
+          <div><b>Assunto:</b> <span id="sim-assunto"></span></div>
+        </div>
+        <div class="corpo" id="sim-corpo"></div>
+      </div>
+      <div class="botoes">
+        <button class="acao" onclick="responderSimulacao(true)">É golpe</button>
+        <button class="acao secundario" onclick="responderSimulacao(false)">É confiável</button>
+      </div>
+      <div id="sim-retorno"></div>
+    </div>
+  </section>
+
+  <!-- DICAS -->
+  <section id="tela-dicas" class="tela oculto">
+    <div class="cartao">
+      <h2>Dicas de segurança</h2>
+      <p>Marque os hábitos que você costuma ter. As recomendações são ajustadas conforme as respostas.</p>
+      <div id="lista-habitos"></div>
+      <div class="botoes"><button class="acao" onclick="gerarRecomendacoes()">Ver recomendações</button></div>
+      <div id="recomendacoes"></div>
+    </div>
+  </section>
+
+  <!-- RELATÓRIO -->
+  <section id="tela-relatorio" class="tela oculto">
+    <div class="cartao">
+      <h2>Relatório de desempenho da turma</h2>
+      <p>Os dados são registrados sem identificação dos alunos, apenas por turma.</p>
+      <table>
+        <thead><tr><th>Indicador</th><th>Resultado</th></tr></thead>
+        <tbody id="corpo-relatorio"></tbody>
+      </table>
+      <div class="botoes">
+        <button class="acao" onclick="exportarCsv()">Exportar CSV</button>
+        <button class="acao secundario" onclick="reiniciar()">Reiniciar sessão</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="rodape">Material aberto e gratuito — Atividades Extensionistas UNINTER — Escola Superior Politécnica</div>
+
+<script>
+/* ---------- RF08: versionamento do conteúdo educacional ---------- */
+const CONTEUDO = {
+  versao: "1.3.0",
+  revisao: "2026-09-10",
+  turma: "Turma A",
+  modulos: [
+    { id:"phishing", titulo:"Phishing", resumo:"Como identificar mensagens que tentam roubar seus dados.",
+      texto:["Phishing é a tentativa de enganar a pessoa para que ela entregue senhas, dados bancários ou instale um programa malicioso.",
+             "O golpe quase sempre usa urgência ('sua conta será bloqueada hoje'), um remetente parecido com o verdadeiro e um link que leva a uma página falsa.",
+             "Antes de clicar, confira o endereço do remetente, passe o mouse sobre o link para ver o destino real e, na dúvida, acesse o site digitando o endereço você mesmo."] },
+    { id:"senhas", titulo:"Senhas seguras", resumo:"Como criar e guardar senhas difíceis de descobrir.",
+      texto:["Uma senha forte é longa e não tem relação com dados pessoais como nome, data de nascimento ou time.",
+             "Reutilizar a mesma senha em vários sites é o erro mais comum: se um site vaza, todos os outros ficam expostos.",
+             "Ative a verificação em duas etapas sempre que o serviço oferecer, mesmo que a senha seja boa."] },
+    { id:"malware", titulo:"Malware", resumo:"Programas maliciosos e como evitá-los.",
+      texto:["Malware é qualquer programa feito para prejudicar o usuário: vírus, ransomware, spyware e outros.",
+             "A infecção costuma vir de anexos, instaladores baixados fora das lojas oficiais e cópias piratas de programas.",
+             "Manter o sistema e o navegador atualizados fecha as falhas que esses programas exploram."] },
+    { id:"fraudes", titulo:"Fraudes on-line", resumo:"Compras, prêmios e ofertas boas demais.",
+      texto:["Fraudes on-line exploram a pressa e a vontade de aproveitar uma oferta: preço muito abaixo do mercado, prêmio não solicitado ou cobrança inesperada.",
+             "Desconfie de pagamentos apenas por transferência instantânea e de vendedores sem histórico.",
+             "Perfis clonados de amigos pedindo dinheiro são frequentes: confirme por telefone antes de pagar."] }
+  ]
+};
+
+/* RF01 a RF06: perguntas, simulações, hábitos e dicas */
+const PERGUNTAS = [
+  { pergunta:"Você recebe um e-mail do 'banco' pedindo para atualizar a senha por um link. O que fazer?",
+    alternativas:["Clicar no link e atualizar", "Ignorar e acessar o site do banco digitando o endereço", "Responder o e-mail pedindo confirmação", "Encaminhar para os colegas"],
+    correta:1, explicacao:"Bancos não pedem atualização de senha por link. Acessar digitando o endereço evita a página falsa." },
+  { pergunta:"Qual destas é a senha mais segura?",
+    alternativas:["alexis2007", "123456789", "chuva-verde-42-telhado", "senha@123"],
+    correta:2, explicacao:"Senhas longas formadas por palavras aleatórias são difíceis de quebrar e fáceis de lembrar." },
+  { pergunta:"O que é verificação em duas etapas?",
+    alternativas:["Digitar a senha duas vezes", "Um segundo código, além da senha, para entrar na conta", "Trocar a senha a cada dois meses", "Ter duas contas diferentes"],
+    correta:1, explicacao:"Mesmo que a senha vaze, o invasor ainda precisaria do segundo código para entrar." },
+  { pergunta:"Um site oferece um celular novo por 10% do preço, pagando só por transferência. Isso indica:",
+    alternativas:["Uma boa oportunidade", "Provável fraude", "Um site oficial em promoção", "Nada de anormal"],
+    correta:1, explicacao:"Preço muito abaixo do mercado e pagamento apenas por transferência são sinais clássicos de fraude." },
+  { pergunta:"Qual atitude reduz o risco de malware no computador da escola?",
+    alternativas:["Baixar programas de sites de download aleatórios", "Desligar as atualizações", "Manter o sistema e o navegador atualizados", "Usar sempre o mesmo pendrive"],
+    correta:2, explicacao:"As atualizações corrigem as falhas que os programas maliciosos exploram." }
+];
+
+const SIMULACOES = [
+  { de:"suporte@banc0-seguro.com", assunto:"URGENTE: sua conta será bloqueada em 24h",
+    corpo:"Prezado cliente, detectamos acesso suspeito. Clique aqui em ate 24 horas para revalidar sua senha, caso contrario sua conta sera bloqueada.",
+    golpe:true, pistas:"O domínio usa zero no lugar da letra o, o texto cria urgência e pede senha por link. São três sinais de phishing." },
+  { de:"secretaria@colegio.pr.gov.br", assunto:"Reunião de pais na próxima quinta-feira",
+    corpo:"Informamos que a reunião de pais ocorrerá na quinta-feira, às 19h, no auditório. Não é necessário confirmar presença nem enviar documentos.",
+    golpe:false, pistas:"Domínio oficial da instituição, sem urgência, sem link e sem pedido de dados. Mensagem legítima." },
+  { de:"premios@sorteio-nacional.net", assunto:"Você foi sorteado! Retire seu prêmio",
+    corpo:"Parabens! Voce ganhou um celular. Para liberar a entrega, informe seus dados e pague a taxa de R$ 49,90 no PIX abaixo.",
+    golpe:true, pistas:"Prêmio não solicitado e cobrança de taxa antecipada por PIX: fraude on-line." }
+];
+
+const HABITOS = [
+  { id:"h1", texto:"Uso a mesma senha em mais de um site", recomendacao:"Troque as senhas repetidas e comece pelos serviços de e-mail e banco: quem tem seu e-mail recupera as outras contas." },
+  { id:"h2", texto:"Não uso verificação em duas etapas", recomendacao:"Ative a verificação em duas etapas no e-mail e nas redes sociais; leva dois minutos e é a proteção mais eficaz." },
+  { id:"h3", texto:"Costumo clicar em links recebidos por mensagem", recomendacao:"Antes de clicar, confira o remetente e o endereço do link; na dúvida, acesse o site digitando o endereço." },
+  { id:"h4", texto:"Uso redes Wi-Fi públicas para acessar contas", recomendacao:"Evite acessar banco e e-mail em Wi-Fi aberto; prefira os dados do celular nessas situações." },
+  { id:"h5", texto:"Adio as atualizações do sistema", recomendacao:"Deixe as atualizações automáticas ligadas: elas corrigem as falhas usadas por programas maliciosos." }
+];
+
+/* ---------- RF07: registro anônimo de desempenho ---------- */
+const sessao = { quizRespondidas:0, quizAcertos:0, simFeitas:0, simAcertos:0, modulosVistos:new Set(), perguntas:[], iSim:0 };
+
+/* ---------- navegação ---------- */
+const TELAS = [["inicio","Início"],["modulo","Módulos"],["quiz","Quiz"],["simulacao","Simulação"],["dicas","Dicas"],["relatorio","Relatório"]];
+function montarMenu(){
+  document.getElementById("menu").innerHTML = TELAS.map(t=>
+    `<button data-tela="${t[0]}" onclick="abrir('${t[0]}')">${t[1]}</button>`).join("");
+}
+function abrir(tela){
+  var secoes = document.querySelectorAll(".tela");
+  for(var i=0;i<secoes.length;i++) secoes[i].className = "tela oculto";
+  document.getElementById("tela-"+tela).className = "tela";
+  var bts = document.querySelectorAll("#menu button");
+  for(var j=0;j<bts.length;j++) bts[j].className = (bts[j].getAttribute("data-tela")===tela) ? "ativo" : "";
+  if(tela==="modulo" && !document.getElementById("conteudo-modulo").innerHTML) abrirModulo(0);
+  if(tela==="quiz") proximaPergunta();
+  if(tela==="simulacao") mostrarSimulacao();
+  if(tela==="relatorio") montarRelatorio();
+}
+
+/* ---------- módulos ---------- */
+function montarModulos(){
+  document.getElementById("lista-modulos").innerHTML = CONTEUDO.modulos.map((m,i)=>
+    `<div class="modulo" onclick="abrirModulo(${i})"><b>${m.titulo}</b><span>${m.resumo}</span></div>`).join("");
+}
+function abrirModulo(i){
+  const m = CONTEUDO.modulos[i];
+  sessao.modulosVistos.add(m.id);
+  document.getElementById("conteudo-modulo").innerHTML =
+    `<h2>${m.titulo}</h2>` + m.texto.map(t=>`<p>${t}</p>`).join("") +
+    `<h3>O que fazer na prática</h3><div class="dica">Em caso de dúvida, não clique e procure um adulto responsável ou a equipe da escola.</div>
+     <div class="botoes"><button class="acao" onclick="abrir('quiz')">Responder o quiz</button>
+     <button class="acao secundario" onclick="abrir('inicio')">Voltar aos módulos</button></div>`;
+  atualizarProgresso();
+  abrir("modulo");
+}
+function atualizarProgresso(){
+  const pct = Math.round(100*sessao.modulosVistos.size/CONTEUDO.modulos.length);
+  document.getElementById("barra-progresso").style.width = pct+"%";
+  document.getElementById("txt-progresso").textContent =
+    `${sessao.modulosVistos.size} de ${CONTEUDO.modulos.length} módulos acessados (${pct}%).`;
+}
+
+/* ---------- quiz ---------- */
+let iPergunta = -1, respondida = false;
+function proximaPergunta(){
+  iPergunta++; respondida=false;
+  document.getElementById("quiz-retorno").innerHTML="";
+  if(iPergunta >= PERGUNTAS.length){
+    document.getElementById("quiz-posicao").textContent="Quiz concluído.";
+    document.getElementById("quiz-pergunta").textContent=
+      `Você acertou ${sessao.quizAcertos} de ${PERGUNTAS.length} perguntas.`;
+    document.getElementById("quiz-alternativas").innerHTML="";
+    document.getElementById("quiz-proxima").textContent="Ver relatório";
+    document.getElementById("quiz-proxima").onclick=()=>abrir("relatorio");
+    return;
+  }
+  const p = PERGUNTAS[iPergunta];
+  document.getElementById("quiz-posicao").textContent = `Pergunta ${iPergunta+1} de ${PERGUNTAS.length}`;
+  document.getElementById("quiz-pergunta").textContent = p.pergunta;
+  document.getElementById("quiz-alternativas").innerHTML = p.alternativas.map((a,i)=>
+    `<button class="alt" onclick="responderQuiz(${i})">${a}</button>`).join("");
+}
+function responderQuiz(i){
+  if(respondida) return; respondida=true;
+  const p = PERGUNTAS[iPergunta], acertou = (i===p.correta);
+  sessao.quizRespondidas++; if(acertou) sessao.quizAcertos++;
+  sessao.perguntas.push({n:iPergunta+1, acertou:acertou});
+  const bts = document.querySelectorAll("#quiz-alternativas .alt");
+  bts[p.correta].classList.add("certo");
+  if(!acertou) bts[i].classList.add("errado");
+  document.getElementById("quiz-retorno").innerHTML =
+    `<div class="aviso ${acertou?'ok':'nok'}"><b>${acertou?'Correto.':'Não é essa.'}</b> ${p.explicacao}</div>`;
+}
+document.addEventListener("DOMContentLoaded", ()=>{
+  document.getElementById("quiz-proxima").onclick = proximaPergunta;
+});
+
+/* ---------- simulação ---------- */
+function mostrarSimulacao(){
+  const s = SIMULACOES[sessao.iSim % SIMULACOES.length];
+  document.getElementById("sim-de").textContent = s.de;
+  document.getElementById("sim-assunto").textContent = s.assunto;
+  document.getElementById("sim-corpo").textContent = s.corpo;
+  document.getElementById("sim-retorno").innerHTML = "";
+}
+function responderSimulacao(disseGolpe){
+  const s = SIMULACOES[sessao.iSim % SIMULACOES.length];
+  const acertou = (disseGolpe === s.golpe);
+  sessao.simFeitas++; if(acertou) sessao.simAcertos++;
+  document.getElementById("sim-retorno").innerHTML =
+    `<div class="aviso ${acertou?'ok':'nok'}"><b>${acertou?'Você identificou corretamente.':'Atenção.'}</b> ${s.pistas}</div>
+     <div class="botoes"><button class="acao" onclick="sessao.iSim++;mostrarSimulacao()">Próxima mensagem</button></div>`;
+}
+
+/* ---------- dicas conforme hábitos ---------- */
+function montarHabitos(){
+  document.getElementById("lista-habitos").innerHTML = HABITOS.map(h=>
+    `<label style="display:block;margin:8px 0"><input type="checkbox" id="${h.id}"> ${h.texto}</label>`).join("");
+}
+function gerarRecomendacoes(){
+  const marcados = HABITOS.filter(h=>document.getElementById(h.id).checked);
+  const html = marcados.length
+    ? marcados.map(h=>`<div class="dica"><b>${h.texto}</b><br>${h.recomendacao}</div>`).join("")
+    : `<div class="dica">Nenhum hábito de risco marcado. Continue atento e mantenha a verificação em duas etapas ativa.</div>`;
+  document.getElementById("recomendacoes").innerHTML = "<h3>Recomendações para você</h3>" + html;
+}
+
+/* ---------- relatório ---------- */
+function montarRelatorio(){
+  const pctQuiz = sessao.quizRespondidas ? Math.round(100*sessao.quizAcertos/sessao.quizRespondidas) : 0;
+  const pctSim  = sessao.simFeitas ? Math.round(100*sessao.simAcertos/sessao.simFeitas) : 0;
+  const linhas = [
+    ["Turma", CONTEUDO.turma],
+    ["Versão do conteúdo aplicado", CONTEUDO.versao + " (" + CONTEUDO.revisao + ")"],
+    ["Módulos acessados", sessao.modulosVistos.size + " de " + CONTEUDO.modulos.length],
+    ["Perguntas respondidas", sessao.quizRespondidas],
+    ["Acertos no quiz", sessao.quizAcertos + " (" + pctQuiz + "%)"],
+    ["Simulações realizadas", sessao.simFeitas],
+    ["Acertos nas simulações", sessao.simAcertos + " (" + pctSim + "%)"]
+  ];
+  document.getElementById("corpo-relatorio").innerHTML =
+    linhas.map(l=>`<tr><td>${l[0]}</td><td>${l[1]}</td></tr>`).join("");
+}
+function exportarCsv(){
+  const linhas = [["indicador","valor"],
+    ["turma",CONTEUDO.turma],["versao_conteudo",CONTEUDO.versao],
+    ["modulos_acessados",sessao.modulosVistos.size],
+    ["quiz_respondidas",sessao.quizRespondidas],["quiz_acertos",sessao.quizAcertos],
+    ["simulacoes",sessao.simFeitas],["simulacoes_acertos",sessao.simAcertos]];
+  const csv = linhas.map(l=>l.join(";")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = "desempenho_turma.csv"; a.click();
+}
+function reiniciar(){ location.reload(); }
+
+/* ---------- inicialização ---------- */
+document.getElementById("versao").textContent = CONTEUDO.versao;
+montarMenu(); montarModulos(); montarHabitos(); atualizarProgresso();
+const alvo = new URLSearchParams(location.search).get("tela") || "inicio";
+abrir(alvo);
+
+/* ---------- modo demonstração (usado para as capturas de tela do relatório) ---------- */
+if(new URLSearchParams(location.search).get("demo")==="1"){
+  if(alvo==="quiz"){ responderQuiz(1); }
+  if(alvo==="simulacao"){ responderSimulacao(true); }
+  if(alvo==="dicas"){ document.getElementById("h1").checked=true; document.getElementById("h3").checked=true; gerarRecomendacoes(); }
+  if(alvo==="relatorio"){ sessao.modulosVistos.add("phishing"); sessao.modulosVistos.add("senhas");
+    sessao.quizRespondidas=5; sessao.quizAcertos=4; sessao.simFeitas=3; sessao.simAcertos=3; montarRelatorio(); }
+}
+</script>
+</body>
+</html>
